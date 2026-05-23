@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparateur d'humidex</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: radial-gradient(circle at top, #fff7ed 0%, #f6f7f2 42%, #eef4ff 100%);
+      --panel: rgba(255, 255, 255, 0.84);
+      --panel-strong: rgba(255, 252, 245, 0.92);
+      --border: rgba(116, 95, 68, 0.18);
+      --text: #2e241a;
+      --muted: #73675b;
+      --track: rgba(124, 112, 96, 0.2);
+      --shadow: 0 22px 48px rgba(92, 72, 46, 0.12);
+      --green: #2f9e44;
+      --green-soft: rgba(47, 158, 68, 0.14);
+      --orange: #f59f00;
+      --orange-soft: rgba(245, 159, 0, 0.14);
+      --red: #d94841;
+      --red-soft: rgba(217, 72, 65, 0.14);
+      --neutral: #6b7280;
+      --neutral-soft: rgba(107, 114, 128, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 18px;
+      font-family: Aptos, "Segoe UI Variable", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    main {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      padding: 28px;
+      border-radius: 28px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .intro {
+      margin-top: 10px;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #8b6c46;
+    }
+
+    .input-grid,
+    .result-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 26px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card,
+    .metric-card,
+    .advice-banner {
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .card-head,
+    .metric-head,
+    .advice-layout {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-head h2,
+    .metric-label {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .icon-chip,
+    .metric-icon,
+    .advice-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    .icon-chip {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(116, 95, 68, 0.12);
+      color: #5c4f43;
+    }
+
+    .field {
+      display: block;
+      margin-top: 18px;
+    }
+
+    .field span {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .field-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(116, 95, 68, 0.16);
+      background: rgba(255, 255, 255, 0.88);
+      font: inherit;
+      font-size: 1.3rem;
+      color: var(--text);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: rgba(139, 108, 70, 0.55);
+      box-shadow: 0 0 0 4px rgba(245, 159, 0, 0.12);
+    }
+
+    .unit {
+      min-width: 44px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .metric-card {
+      padding: 18px 22px;
+      --bar-start: #94a3b8;
+      --bar-end: #cbd5e1;
+      --bar-width: 0%;
+    }
+
+    .metric-card[data-tone="mild"] {
+      --bar-start: #2f9e44;
+      --bar-end: #69db7c;
+    }
+
+    .metric-card[data-tone="warm"] {
+      --bar-start: #f59f00;
+      --bar-end: #ffd43b;
+    }
+
+    .metric-card[data-tone="hot"] {
+      --bar-start: #d94841;
+      --bar-end: #ff8787;
+    }
+
+    .metric-head {
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--muted);
+    }
+
+    .metric-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .metric-value-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .metric-value {
+      font-size: clamp(2rem, 6vw, 3rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-feeling {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .meter {
+      margin-top: 16px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--track);
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      display: block;
+      width: var(--bar-width);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--bar-start), var(--bar-end));
+      transition: width 0.24s ease, background 0.24s ease;
+    }
+
+    .advice-block {
+      margin-top: 18px;
+    }
+
+    .advice-banner {
+      padding: 18px 20px;
+      color: var(--neutral);
+      background: var(--neutral-soft);
+      border-color: rgba(107, 114, 128, 0.28);
+      transition: background-color 0.24s ease, border-color 0.24s ease, color 0.24s ease;
+    }
+
+    .advice-banner[data-state="open"] {
+      color: #236a35;
+      background: var(--green-soft);
+      border-color: rgba(47, 158, 68, 0.28);
+    }
+
+    .advice-banner[data-state="closed"] {
+      color: #a23028;
+      background: var(--red-soft);
+      border-color: rgba(217, 72, 65, 0.35);
+    }
+
+    .advice-banner[data-state="neutral"] {
+      color: #5f6674;
+      background: var(--neutral-soft);
+      border-color: rgba(107, 114, 128, 0.28);
+    }
+
+    .advice-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .advice-copy {
+      min-width: 0;
+    }
+
+    .advice-title {
+      font-size: 1.55rem;
+      line-height: 1.1;
+    }
+
+    .advice-text {
+      margin-top: 6px;
+      font-size: 1rem;
+      color: currentColor;
+      opacity: 0.92;
+    }
+
+    .difference-line {
+      margin-top: 10px;
+      padding-inline: 2px;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    .tabler-icon {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @media (max-width: 620px) {
+      body {
+        padding: 14px;
+      }
+
+      main {
+        padding: 20px;
+        border-radius: 22px;
+      }
+
+      .card,
+      .metric-card,
+      .advice-banner {
+        padding-inline: 16px;
+      }
+
+      .metric-value-row {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .advice-layout {
+        align-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="eyebrow">Comparer dedans / dehors</span>
+    <h1>Comparateur d'humidex</h1>
+    <p class="intro">Entrez la température et l'humidité intérieure et extérieure pour voir tout de suite s'il vaut mieux ouvrir les fenêtres.</p>
+
+    <section class="input-grid" aria-label="Saisie des données météo">
+      <article class="card">
+        <div class="card-head">
+          <span class="icon-chip" aria-hidden="true">
+            <svg class="tabler-icon" viewBox="0 0 24 24">
+              <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+              <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
+            </svg>
+          </span>
+          <h2>Intérieur</h2>
+        </div>
+
+        <label class="field" for="indoorTemp">
+          <span>Température</span>
+          <div class="field-control">
+            <input id="indoorTemp" type="number" inputmode="decimal" step="any" value="25">
+            <span class="unit">°C</span>
+          </div>
+        </label>
+
+        <label class="field" for="indoorHumidity">
+          <span>Humidité relative</span>
+          <div class="field-control">
+            <input id="indoorHumidity" type="number" inputmode="decimal" min="0" max="100" step="any" value="60">
+            <span class="unit">%</span>
+          </div>
+        </label>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <span class="icon-chip" aria-hidden="true">
+            <svg class="tabler-icon" viewBox="0 0 24 24">
+              <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
+            </svg>
+          </span>
+          <h2>Extérieur</h2>
+        </div>
+
+        <label class="field" for="outdoorTemp">
+          <span>Température</span>
+          <div class="field-control">
+            <input id="outdoorTemp" type="number" inputmode="decimal" step="any" value="20">
+            <span class="unit">°C</span>
+          </div>
+        </label>
+
+        <label class="field" for="outdoorHumidity">
+          <span>Humidité relative</span>
+          <div class="field-control">
+            <input id="outdoorHumidity" type="number" inputmode="decimal" min="0" max="100" step="any" value="55">
+            <span class="unit">%</span>
+          </div>
+        </label>
+      </article>
+    </section>
+
+    <section class="result-grid" aria-label="Résultats humidex">
+      <article id="indoorCard" class="metric-card" data-tone="pending">
+        <div class="metric-head">
+          <span class="metric-icon" aria-hidden="true">
+            <svg class="tabler-icon" viewBox="0 0 24 24">
+              <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+              <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
+            </svg>
+          </span>
+          <span class="metric-label">Humidex intérieur</span>
+        </div>
+
+        <div class="metric-value-row">
+          <strong id="indoorHumidex" class="metric-value" aria-live="polite">-</strong>
+          <span id="indoorFeeling" class="metric-feeling">En attente</span>
+        </div>
+
+        <div class="meter" aria-hidden="true">
+          <span id="indoorMeter" class="meter-fill"></span>
+        </div>
+      </article>
+
+      <article id="outdoorCard" class="metric-card" data-tone="pending">
+        <div class="metric-head">
+          <span class="metric-icon" aria-hidden="true">
+            <svg class="tabler-icon" viewBox="0 0 24 24">
+              <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
+            </svg>
+          </span>
+          <span class="metric-label">Humidex extérieur</span>
+        </div>
+
+        <div class="metric-value-row">
+          <strong id="outdoorHumidex" class="metric-value" aria-live="polite">-</strong>
+          <span id="outdoorFeeling" class="metric-feeling">En attente</span>
+        </div>
+
+        <div class="meter" aria-hidden="true">
+          <span id="outdoorMeter" class="meter-fill"></span>
+        </div>
+      </article>
+    </section>
+
+    <section class="advice-block" aria-label="Conseil d'aération">
+      <div id="adviceBanner" class="advice-banner" data-state="neutral" role="status" aria-live="polite">
+        <div class="advice-layout">
+          <div id="decisionIcon" class="advice-icon" aria-hidden="true"></div>
+
+          <div class="advice-copy">
+            <h3 id="decisionTitle" class="advice-title">Renseignez les 4 champs</h3>
+            <p id="decisionText" class="advice-text">La recommandation s'ajuste immédiatement à chaque frappe.</p>
+          </div>
+        </div>
+      </div>
+
+      <p id="differenceLine" class="difference-line">Différence : en attente de deux humidex valides.</p>
+    </section>
+  </main>
+
+  <script>
+    const indoorTempInput = document.getElementById("indoorTemp");
+    const indoorHumidityInput = document.getElementById("indoorHumidity");
+    const outdoorTempInput = document.getElementById("outdoorTemp");
+    const outdoorHumidityInput = document.getElementById("outdoorHumidity");
+
+    const indoorCard = document.getElementById("indoorCard");
+    const outdoorCard = document.getElementById("outdoorCard");
+    const indoorHumidexOutput = document.getElementById("indoorHumidex");
+    const outdoorHumidexOutput = document.getElementById("outdoorHumidex");
+    const indoorFeelingOutput = document.getElementById("indoorFeeling");
+    const outdoorFeelingOutput = document.getElementById("outdoorFeeling");
+    const indoorMeter = document.getElementById("indoorMeter");
+    const outdoorMeter = document.getElementById("outdoorMeter");
+
+    const adviceBanner = document.getElementById("adviceBanner");
+    const decisionIcon = document.getElementById("decisionIcon");
+    const decisionTitle = document.getElementById("decisionTitle");
+    const decisionText = document.getElementById("decisionText");
+    const differenceLine = document.getElementById("differenceLine");
+
+    const icons = {
+      doorOpen: `
+        <svg class="tabler-icon" viewBox="0 0 24 24">
+          <path d="M5 21h12"></path>
+          <path d="M13 21v-18l-7 2v16"></path>
+          <path d="M13 4h4a2 2 0 0 1 2 2v15"></path>
+          <path d="M10 12h.01"></path>
+        </svg>
+      `,
+      doorClosed: `
+        <svg class="tabler-icon" viewBox="0 0 24 24">
+          <path d="M4 4l16 16"></path>
+          <path d="M5 21h12"></path>
+          <path d="M13 13v8"></path>
+          <path d="M8 8.2v-3.2l7 2v9"></path>
+          <path d="M17 13v-7a2 2 0 0 0 -2 -2h-3"></path>
+        </svg>
+      `,
+      doorNeutral: `
+        <svg class="tabler-icon" viewBox="0 0 24 24">
+          <path d="M5 21h14"></path>
+          <path d="M15 21v-18l-8 2v16"></path>
+          <path d="M15 4h3a1 1 0 0 1 1 1v16"></path>
+          <path d="M11 12h.01"></path>
+        </svg>
+      `
+    };
+
+    function parseFieldValue(input) {
+      const value = Number.parseFloat(input.value);
+      return Number.isFinite(value) ? value : null;
+    }
+
+    function calculateHumidex(temperature, humidity) {
+      if (humidity <= 0 || humidity > 100) {
+        return null;
+      }
+
+      const alpha = Math.log(humidity / 100) + (17.625 * temperature) / (243.04 + temperature);
+      const dewPoint = (243.04 * alpha) / (17.625 - alpha);
+      const vaporPressure = 6.11 * Math.exp(5417.753 * ((1 / 273.16) - (1 / (273.15 + dewPoint))));
+
+      return temperature + (5 / 9) * (vaporPressure - 10);
+    }
+
+    function getHumidexTone(value) {
+      if (value < 27) {
+        return { tone: "mild", feeling: "Confortable" };
+      }
+
+      if (value < 34) {
+        return { tone: "warm", feeling: "Lourd" };
+      }
+
+      return { tone: "hot", feeling: "Accablant" };
+    }
+
+    function getMeterWidth(value) {
+      const percentage = (value / 45) * 100;
+      return `${Math.max(0, Math.min(100, percentage)).toFixed(1)}%`;
+    }
+
+    function formatHumidex(value) {
+      return value === null ? "-" : value.toFixed(1);
+    }
+
+    function formatPoints(value) {
+      const amount = value.toFixed(1);
+      const unit = Number(value.toFixed(1)) === 1 ? "point" : "points";
+      return `${amount} ${unit}`;
+    }
+
+    function updateMetric(card, output, feelingOutput, meter, value) {
+      if (value === null) {
+        output.textContent = "-";
+        feelingOutput.textContent = "En attente";
+        card.dataset.tone = "pending";
+        card.style.setProperty("--bar-width", "0%");
+        meter.style.width = "0%";
+        return;
+      }
+
+      const { tone, feeling } = getHumidexTone(value);
+
+      output.textContent = formatHumidex(value);
+      feelingOutput.textContent = feeling;
+      card.dataset.tone = tone;
+      card.style.setProperty("--bar-width", getMeterWidth(value));
+      meter.style.width = getMeterWidth(value);
+    }
+
+    function setAdvice(state, title, text, difference, iconMarkup) {
+      adviceBanner.dataset.state = state;
+      decisionTitle.textContent = title;
+      decisionText.textContent = text;
+      differenceLine.textContent = difference;
+      decisionIcon.innerHTML = iconMarkup;
+    }
+
+    function updateComparison() {
+      const indoorTemp = parseFieldValue(indoorTempInput);
+      const indoorHumidity = parseFieldValue(indoorHumidityInput);
+      const outdoorTemp = parseFieldValue(outdoorTempInput);
+      const outdoorHumidity = parseFieldValue(outdoorHumidityInput);
+
+      if (
+        indoorTemp === null ||
+        indoorHumidity === null ||
+        outdoorTemp === null ||
+        outdoorHumidity === null
+      ) {
+        updateMetric(indoorCard, indoorHumidexOutput, indoorFeelingOutput, indoorMeter, null);
+        updateMetric(outdoorCard, outdoorHumidexOutput, outdoorFeelingOutput, outdoorMeter, null);
+        setAdvice(
+          "neutral",
+          "Renseignez les 4 champs",
+          "La recommandation s'ajuste immédiatement à chaque frappe.",
+          "Différence : en attente de deux humidex valides.",
+          icons.doorNeutral
+        );
+        return;
+      }
+
+      const indoorHumidex = calculateHumidex(indoorTemp, indoorHumidity);
+      const outdoorHumidex = calculateHumidex(outdoorTemp, outdoorHumidity);
+
+      updateMetric(indoorCard, indoorHumidexOutput, indoorFeelingOutput, indoorMeter, indoorHumidex);
+      updateMetric(outdoorCard, outdoorHumidexOutput, outdoorFeelingOutput, outdoorMeter, outdoorHumidex);
+
+      if (indoorHumidex === null || outdoorHumidex === null) {
+        setAdvice(
+          "neutral",
+          "Valeurs à corriger",
+          "L'humidité doit rester strictement entre 0 % et 100 %.",
+          "Différence : impossible à calculer avec ces valeurs.",
+          icons.doorNeutral
+        );
+        return;
+      }
+
+      const delta = Number((indoorHumidex - outdoorHumidex).toFixed(1));
+      const absoluteDelta = Math.abs(delta);
+
+      if (delta > 0) {
+        setAdvice(
+          "open",
+          "Ouvrir les fenêtres",
+          "Dehors est plus frais : l'air extérieur peut alléger le ressenti intérieur.",
+          `Différence : ${formatPoints(absoluteDelta)} d'humidex en moins dehors.`,
+          icons.doorOpen
+        );
+        return;
+      }
+
+      if (delta < 0) {
+        setAdvice(
+          "closed",
+          "Garder les fenêtres fermées",
+          "Dehors est plus lourd : conservez la fraîcheur intérieure.",
+          `Différence : ${formatPoints(absoluteDelta)} d'humidex en plus dehors.`,
+          icons.doorClosed
+        );
+        return;
+      }
+
+      setAdvice(
+        "neutral",
+        "Ressenti équivalent",
+        "L'intérieur et l'extérieur affichent le même humidex.",
+        "Différence : 0.0 point d'humidex.",
+        icons.doorNeutral
+      );
+    }
+
+    [
+      indoorTempInput,
+      indoorHumidityInput,
+      outdoorTempInput,
+      outdoorHumidityInput
+    ].forEach((input) => {
+      input.addEventListener("input", updateComparison);
+    });
+
+    updateComparison();
+  </script>
+</body>
+</html>
