@@ -470,21 +470,25 @@
       main {
         min-height: calc(100dvh - 20px);
         max-height: calc(100dvh - 20px);
-        padding: 16px;
+        padding: 14px;
         border-radius: 22px;
         display: grid;
         grid-template-rows: auto auto minmax(0, 1fr) auto;
-        gap: 12px;
+        gap: 10px;
         overflow: hidden;
       }
 
       .hero {
         display: grid;
-        gap: 6px;
+        gap: 4px;
       }
 
       h1 {
-        overflow-wrap: anywhere;
+        font-size: clamp(1.7rem, 8vw, 2.35rem);
+        line-height: 0.94;
+        letter-spacing: -0.06em;
+        white-space: nowrap;
+        overflow-wrap: normal;
       }
 
       .intro {
@@ -493,7 +497,11 @@
 
       .mobile-wizard {
         display: grid;
-        gap: 10px;
+        gap: 8px;
+      }
+
+      .mobile-step-copy {
+        gap: 2px;
       }
 
       .mobile-panels {
@@ -526,8 +534,7 @@
       .input-grid > .card {
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        height: 100%;
+        justify-content: flex-start;
       }
 
       .results-stack {
@@ -549,8 +556,31 @@
       .card,
       .metric-card,
       .advice-banner {
-        padding: 14px;
+        padding: 12px;
         border-radius: 18px;
+      }
+
+      .field {
+        margin-top: 12px;
+      }
+
+      .field span {
+        margin-bottom: 4px;
+        font-size: 0.92rem;
+      }
+
+      .field-control {
+        gap: 6px;
+      }
+
+      input {
+        padding: 10px 12px;
+        font-size: 0.98rem;
+      }
+
+      .unit {
+        min-width: 30px;
+        font-size: 0.92rem;
       }
 
       .metric-card {
@@ -584,6 +614,7 @@
       .mobile-nav {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        margin-top: 2px;
       }
 
       main[data-mobile-step="1"] .mobile-nav {
@@ -593,7 +624,7 @@
 
     @media (max-width: 480px) {
       h1 {
-        font-size: clamp(1.85rem, 9vw, 2.4rem);
+        font-size: clamp(1.55rem, 7.6vw, 1.95rem);
       }
 
       .eyebrow {
@@ -612,19 +643,20 @@
       }
 
       .mobile-step-kicker {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
       }
 
       .mobile-step-title {
-        font-size: 1.06rem;
+        font-size: 1rem;
       }
 
       .mobile-step-text {
-        font-size: 0.88rem;
+        font-size: 0.82rem;
+        line-height: 1.28;
       }
 
       .mobile-step-dot {
-        padding: 8px 6px;
+        padding: 7px 6px;
         border-radius: 12px;
         font-size: 0.82rem;
       }
@@ -646,26 +678,26 @@
       }
 
       .field {
-        margin-top: 16px;
+        margin-top: 10px;
       }
 
       .field span {
-        margin-bottom: 6px;
-        font-size: 0.96rem;
+        margin-bottom: 4px;
+        font-size: 0.9rem;
       }
 
       .field-control {
-        gap: 8px;
+        gap: 6px;
       }
 
       input {
-        padding: 11px 13px;
-        font-size: 1rem;
+        padding: 9px 11px;
+        font-size: 0.95rem;
       }
 
       .unit {
-        min-width: 34px;
-        font-size: 0.95rem;
+        min-width: 28px;
+        font-size: 0.9rem;
       }
 
       .metric-value {
@@ -692,9 +724,9 @@
       }
 
       .mobile-nav-button {
-        padding: 12px 14px;
+        padding: 10px 12px;
         border-radius: 14px;
-        font-size: 0.9rem;
+        font-size: 0.86rem;
       }
 
       .tabler-icon {
