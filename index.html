@@ -509,6 +509,10 @@
         min-height: 0;
       }
 
+      main[data-mobile-step="3"] .mobile-panels {
+        margin-top: 12px;
+      }
+
       .mobile-panel {
         display: none;
         width: 100%;
@@ -541,6 +545,10 @@
         display: grid;
         gap: 10px;
         align-content: start;
+      }
+
+      main[data-mobile-step="3"] .results-stack {
+        gap: 8px;
       }
 
       .result-grid {
@@ -619,6 +627,10 @@
 
       main[data-mobile-step="1"] .mobile-nav {
         grid-template-columns: 1fr;
+      }
+
+      main[data-mobile-step="3"] .difference-line {
+        display: none;
       }
     }
 
