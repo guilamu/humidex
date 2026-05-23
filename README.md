@@ -1,6 +1,6 @@
 # Comparateur d'humidex
 
-Page web statique pour comparer l'humidex interieur et exterieur.
+[Page web statique pour comparer l'humidex interieur et exterieur](https://guilamu.github.io/humidex/)
 
 ## Utilisation
 
