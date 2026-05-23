@@ -153,9 +153,6 @@
     }
 
     .mobile-step-dot {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       padding: 10px 8px;
       border-radius: 14px;
       border: 1px solid rgba(116, 95, 68, 0.14);
@@ -164,11 +161,6 @@
       font-size: 0.9rem;
       font-weight: 700;
       transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-    }
-
-    .mobile-step-dot .tabler-icon {
-      width: 18px;
-      height: 18px;
     }
 
     .mobile-step-dot[data-state="current"] {
@@ -490,22 +482,20 @@
       }
 
       .mobile-panels {
-        display: flex;
-        width: 100%;
+        display: block;
         min-height: 0;
-        transform: translateX(calc((var(--mobile-step, 1) - 1) * -100%));
-        transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .mobile-panel {
-        flex: 0 0 100%;
+        display: none;
         width: 100%;
-        min-width: 100%;
-        padding-right: 0;
+        min-width: 0;
       }
 
-      .mobile-panel > * {
-        width: 100%;
+      main[data-mobile-step="1"] .mobile-panel[data-mobile-panel="1"],
+      main[data-mobile-step="2"] .mobile-panel[data-mobile-panel="2"],
+      main[data-mobile-step="3"] .mobile-panel[data-mobile-panel="3"] {
+        display: block;
       }
 
       .input-grid,
@@ -578,12 +568,11 @@
 
       .mobile-nav {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
       }
 
-      main[data-mobile-step="1"] .mobile-nav,
-      main[data-mobile-step="3"] .mobile-nav {
-        display: none;
+      main[data-mobile-step="1"] .mobile-nav {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -716,24 +705,9 @@
       </div>
 
       <div class="mobile-stepper" role="tablist" aria-label="Étapes du formulaire">
-        <button type="button" class="mobile-step-dot" data-step="1" data-state="current" aria-label="Étape 1 : Intérieur" aria-pressed="true">
-          <svg class="tabler-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-            <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
-          </svg>
-        </button>
-        <button type="button" class="mobile-step-dot" data-step="2" data-state="upcoming" aria-label="Étape 2 : Extérieur" aria-pressed="false">
-          <svg class="tabler-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
-          </svg>
-        </button>
-        <button type="button" class="mobile-step-dot" data-step="3" data-state="upcoming" aria-label="Étape 3 : Résultat" aria-pressed="false">
-          <svg class="tabler-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 5a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z"></path>
-            <path d="M4 10h16"></path>
-            <path d="M10 4v16"></path>
-          </svg>
-        </button>
+        <button type="button" class="mobile-step-dot" data-step="1" data-state="current" aria-label="Étape 1 : Intérieur" aria-pressed="true">1</button>
+        <button type="button" class="mobile-step-dot" data-step="2" data-state="upcoming" aria-label="Étape 2 : Extérieur" aria-pressed="false">2</button>
+        <button type="button" class="mobile-step-dot" data-step="3" data-state="upcoming" aria-label="Étape 3 : Résultat" aria-pressed="false">3</button>
       </div>
     </section>
 
@@ -866,6 +840,7 @@
 
     <nav class="mobile-nav" aria-label="Navigation mobile du formulaire">
       <button id="mobilePrev" type="button" class="mobile-nav-button mobile-nav-secondary">Retour</button>
+      <button id="mobileNext" type="button" class="mobile-nav-button mobile-nav-primary">Continuer</button>
     </nav>
   </main>
 
@@ -895,6 +870,7 @@
     const mobileStepTitle = document.getElementById("mobileStepTitle");
     const mobileStepText = document.getElementById("mobileStepText");
     const mobilePrevButton = document.getElementById("mobilePrev");
+    const mobileNextButton = document.getElementById("mobileNext");
     const mobileStepButtons = Array.from(document.querySelectorAll(".mobile-step-dot"));
 
     const icons = {
@@ -929,17 +905,20 @@
       1: {
         kicker: "Étape 1",
         title: "Intérieur",
-        text: "Commencez par la température et l'humidité de la pièce à rafraîchir."
+        text: "Commencez par la température et l'humidité de la pièce à rafraîchir.",
+        nextLabel: "Vers l'extérieur"
       },
       2: {
         kicker: "Étape 2",
         title: "Extérieur",
-        text: "Ajoutez les conditions dehors pour comparer le ressenti."
+        text: "Ajoutez les conditions dehors pour comparer le ressenti.",
+        nextLabel: "Voir le résultat"
       },
       3: {
         kicker: "Étape 3",
         title: "Résultat",
-        text: "Les deux humidex sont calculés, vous pouvez décider d'ouvrir ou non."
+        text: "Les deux humidex sont calculés, vous pouvez décider d'ouvrir ou non.",
+        nextLabel: "Modifier l'intérieur"
       }
     };
 
@@ -1032,7 +1011,6 @@
       const stepContent = mobileSteps[currentMobileStep];
 
       mainElement.dataset.mobileStep = String(currentMobileStep);
-      mainElement.style.setProperty("--mobile-step", String(currentMobileStep));
       mobileStepKicker.textContent = stepContent.kicker;
       mobileStepTitle.textContent = stepContent.title;
       mobileStepText.textContent = stepContent.text;
@@ -1040,6 +1018,7 @@
       mobilePrevButton.hidden = currentMobileStep === 1;
       mobilePrevButton.disabled = currentMobileStep === 1;
       mobilePrevButton.textContent = currentMobileStep === 3 ? "Modifier l'extérieur" : "Retour";
+      mobileNextButton.textContent = stepContent.nextLabel;
 
       mobileStepButtons.forEach((button) => {
         const buttonStep = Number(button.dataset.step);
@@ -1167,22 +1146,19 @@
       setMobileStep(currentMobileStep - 1);
     });
 
+    mobileNextButton.addEventListener("click", () => {
+      if (currentMobileStep === 3) {
+        setMobileStep(1);
+        return;
+      }
+
+      setMobileStep(currentMobileStep + 1);
+    });
+
     mobileStepButtons.forEach((button) => {
       button.addEventListener("click", () => {
         setMobileStep(Number(button.dataset.step));
       });
-    });
-
-    indoorHumidityInput.addEventListener("input", () => {
-      if (indoorHumidityInput.value.trim() !== "" && currentMobileStep === 1) {
-        setMobileStep(2);
-      }
-    });
-
-    outdoorHumidityInput.addEventListener("input", () => {
-      if (outdoorHumidityInput.value.trim() !== "" && currentMobileStep === 2) {
-        setMobileStep(3);
-      }
     });
 
     updateComparison();
