@@ -98,6 +98,23 @@
       display: none;
     }
 
+    .mobile-panels {
+      display: grid;
+      gap: 16px;
+      margin-top: 26px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      align-items: start;
+    }
+
+    .mobile-panel[data-mobile-panel="3"] {
+      grid-column: 1 / -1;
+    }
+
+    .mobile-panel .input-grid,
+    .mobile-panel .results-stack {
+      margin-top: 0;
+    }
+
     .mobile-step-copy {
       display: grid;
       gap: 4px;
@@ -136,6 +153,9 @@
     }
 
     .mobile-step-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 10px 8px;
       border-radius: 14px;
       border: 1px solid rgba(116, 95, 68, 0.14);
@@ -144,6 +164,11 @@
       font-size: 0.9rem;
       font-weight: 700;
       transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .mobile-step-dot .tabler-icon {
+      width: 18px;
+      height: 18px;
     }
 
     .mobile-step-dot[data-state="current"] {
@@ -460,6 +485,20 @@
         gap: 10px;
       }
 
+      .mobile-panels {
+        display: flex;
+        width: 300%;
+        min-height: 0;
+        transform: translateX(calc((var(--mobile-step, 1) - 1) * -33.333333%));
+        transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .mobile-panel {
+        width: 33.333333%;
+        min-width: 33.333333%;
+        padding-right: 8px;
+      }
+
       .input-grid,
       .results-stack {
         margin-top: 0;
@@ -471,26 +510,13 @@
       }
 
       .input-grid > .card {
-        display: none;
-        height: 100%;
-      }
-
-      main[data-mobile-step="1"] .input-grid > .card[data-mobile-step="1"],
-      main[data-mobile-step="2"] .input-grid > .card[data-mobile-step="2"] {
         display: flex;
         flex-direction: column;
         justify-content: center;
-      }
-
-      main[data-mobile-step="3"] .input-grid {
-        display: none;
+        height: 100%;
       }
 
       .results-stack {
-        display: none;
-      }
-
-      main[data-mobile-step="3"] .results-stack {
         display: grid;
         gap: 10px;
         align-content: start;
@@ -543,11 +569,12 @@
 
       .mobile-nav {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
       }
 
-      main[data-mobile-step="1"] .mobile-nav {
-        grid-template-columns: 1fr;
+      main[data-mobile-step="1"] .mobile-nav,
+      main[data-mobile-step="3"] .mobile-nav {
+        display: none;
       }
     }
 
@@ -680,132 +707,156 @@
       </div>
 
       <div class="mobile-stepper" role="tablist" aria-label="Étapes du formulaire">
-        <button type="button" class="mobile-step-dot" data-step="1" data-state="current" aria-label="Étape 1 : Intérieur" aria-pressed="true">1</button>
-        <button type="button" class="mobile-step-dot" data-step="2" data-state="upcoming" aria-label="Étape 2 : Extérieur" aria-pressed="false">2</button>
-        <button type="button" class="mobile-step-dot" data-step="3" data-state="upcoming" aria-label="Étape 3 : Résultat" aria-pressed="false">3</button>
+        <button type="button" class="mobile-step-dot" data-step="1" data-state="current" aria-label="Étape 1 : Intérieur" aria-pressed="true">
+          <svg class="tabler-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+            <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
+          </svg>
+        </button>
+        <button type="button" class="mobile-step-dot" data-step="2" data-state="upcoming" aria-label="Étape 2 : Extérieur" aria-pressed="false">
+          <svg class="tabler-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
+          </svg>
+        </button>
+        <button type="button" class="mobile-step-dot" data-step="3" data-state="upcoming" aria-label="Étape 3 : Résultat" aria-pressed="false">
+          <svg class="tabler-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z"></path>
+            <path d="M4 10h16"></path>
+            <path d="M10 4v16"></path>
+          </svg>
+        </button>
       </div>
     </section>
 
-    <section class="input-grid" aria-label="Saisie des données météo">
-      <article class="card" data-mobile-step="1">
-        <div class="card-head">
-          <span class="icon-chip" aria-hidden="true">
-            <svg class="tabler-icon" viewBox="0 0 24 24">
-              <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-              <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
-            </svg>
-          </span>
-          <h2>Intérieur</h2>
-        </div>
-
-        <label class="field" for="indoorTemp">
-          <span>Température</span>
-          <div class="field-control">
-            <input id="indoorTemp" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*" autofocus>
-            <span class="unit">°C</span>
-          </div>
-        </label>
-
-        <label class="field" for="indoorHumidity">
-          <span>Humidité relative</span>
-          <div class="field-control">
-            <input id="indoorHumidity" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*">
-            <span class="unit">%</span>
-          </div>
-        </label>
-      </article>
-
-      <article class="card" data-mobile-step="2">
-        <div class="card-head">
-          <span class="icon-chip" aria-hidden="true">
-            <svg class="tabler-icon" viewBox="0 0 24 24">
-              <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
-            </svg>
-          </span>
-          <h2>Extérieur</h2>
-        </div>
-
-        <label class="field" for="outdoorTemp">
-          <span>Température</span>
-          <div class="field-control">
-            <input id="outdoorTemp" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*">
-            <span class="unit">°C</span>
-          </div>
-        </label>
-
-        <label class="field" for="outdoorHumidity">
-          <span>Humidité relative</span>
-          <div class="field-control">
-            <input id="outdoorHumidity" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*">
-            <span class="unit">%</span>
-          </div>
-        </label>
-      </article>
-    </section>
-
-    <div class="results-stack" data-mobile-step="3">
-      <section class="result-grid" aria-label="Résultats humidex">
-        <article id="indoorCard" class="metric-card" data-tone="pending">
-          <div class="metric-head">
-            <span class="metric-icon" aria-hidden="true">
-              <svg class="tabler-icon" viewBox="0 0 24 24">
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
-              </svg>
-            </span>
-            <span class="metric-label">Humidex intérieur</span>
-          </div>
-
-          <div class="metric-value-row">
-            <strong id="indoorHumidex" class="metric-value" aria-live="polite">-</strong>
-            <span id="indoorFeeling" class="metric-feeling">En attente</span>
-          </div>
-
-          <div class="meter" aria-hidden="true">
-            <span id="indoorMeter" class="meter-fill"></span>
-          </div>
-        </article>
-
-        <article id="outdoorCard" class="metric-card" data-tone="pending">
-          <div class="metric-head">
-            <span class="metric-icon" aria-hidden="true">
-              <svg class="tabler-icon" viewBox="0 0 24 24">
-                <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
-              </svg>
-            </span>
-            <span class="metric-label">Humidex extérieur</span>
-          </div>
-
-          <div class="metric-value-row">
-            <strong id="outdoorHumidex" class="metric-value" aria-live="polite">-</strong>
-            <span id="outdoorFeeling" class="metric-feeling">En attente</span>
-          </div>
-
-          <div class="meter" aria-hidden="true">
-            <span id="outdoorMeter" class="meter-fill"></span>
-          </div>
-        </article>
-      </section>
-
-      <section class="advice-block" aria-label="Conseil d'aération">
-        <div id="adviceBanner" class="advice-banner" data-state="neutral" role="status" aria-live="polite">
-          <div class="advice-layout">
-            <div id="decisionIcon" class="advice-icon" aria-hidden="true"></div>
-
-            <div class="advice-copy">
-              <h3 id="decisionTitle" class="advice-title">Renseignez les 4 champs</h3>
-              <p id="decisionText" class="advice-text">La recommandation s'ajuste immédiatement à chaque frappe.</p>
+    <div class="mobile-panels">
+      <div class="mobile-panel" data-mobile-panel="1">
+        <section class="input-grid" aria-label="Saisie des données météo intérieure">
+          <article class="card" data-mobile-step="1">
+            <div class="card-head">
+              <span class="icon-chip" aria-hidden="true">
+                <svg class="tabler-icon" viewBox="0 0 24 24">
+                  <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                  <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
+                </svg>
+              </span>
+              <h2>Intérieur</h2>
             </div>
-          </div>
-        </div>
 
-        <p id="differenceLine" class="difference-line">Différence : en attente de deux humidex valides.</p>
-      </section>
+            <label class="field" for="indoorTemp">
+              <span>Température</span>
+              <div class="field-control">
+                <input id="indoorTemp" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*" autofocus>
+                <span class="unit">°C</span>
+              </div>
+            </label>
+
+            <label class="field" for="indoorHumidity">
+              <span>Humidité relative</span>
+              <div class="field-control">
+                <input id="indoorHumidity" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*">
+                <span class="unit">%</span>
+              </div>
+            </label>
+          </article>
+        </section>
+      </div>
+
+      <div class="mobile-panel" data-mobile-panel="2">
+        <section class="input-grid" aria-label="Saisie des données météo extérieure">
+          <article class="card" data-mobile-step="2">
+            <div class="card-head">
+              <span class="icon-chip" aria-hidden="true">
+                <svg class="tabler-icon" viewBox="0 0 24 24">
+                  <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
+                </svg>
+              </span>
+              <h2>Extérieur</h2>
+            </div>
+
+            <label class="field" for="outdoorTemp">
+              <span>Température</span>
+              <div class="field-control">
+                <input id="outdoorTemp" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*">
+                <span class="unit">°C</span>
+              </div>
+            </label>
+
+            <label class="field" for="outdoorHumidity">
+              <span>Humidité relative</span>
+              <div class="field-control">
+                <input id="outdoorHumidity" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" pattern="[0-9]*[.,]?[0-9]*">
+                <span class="unit">%</span>
+              </div>
+            </label>
+          </article>
+        </section>
+      </div>
+
+      <div class="mobile-panel" data-mobile-panel="3">
+        <div class="results-stack" data-mobile-step="3">
+          <section class="result-grid" aria-label="Résultats humidex">
+            <article id="indoorCard" class="metric-card" data-tone="pending">
+              <div class="metric-head">
+                <span class="metric-icon" aria-hidden="true">
+                  <svg class="tabler-icon" viewBox="0 0 24 24">
+                    <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                    <path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1 -1v-7"></path>
+                  </svg>
+                </span>
+                <span class="metric-label">Humidex intérieur</span>
+              </div>
+
+              <div class="metric-value-row">
+                <strong id="indoorHumidex" class="metric-value" aria-live="polite">-</strong>
+                <span id="indoorFeeling" class="metric-feeling">En attente</span>
+              </div>
+
+              <div class="meter" aria-hidden="true">
+                <span id="indoorMeter" class="meter-fill"></span>
+              </div>
+            </article>
+
+            <article id="outdoorCard" class="metric-card" data-tone="pending">
+              <div class="metric-head">
+                <span class="metric-icon" aria-hidden="true">
+                  <svg class="tabler-icon" viewBox="0 0 24 24">
+                    <path d="M6.5 18a4.5 4.5 0 1 1 .4 -8.982a5.5 5.5 0 0 1 10.6 1.982h.5a3.5 3.5 0 0 1 0 7h-11.5"></path>
+                  </svg>
+                </span>
+                <span class="metric-label">Humidex extérieur</span>
+              </div>
+
+              <div class="metric-value-row">
+                <strong id="outdoorHumidex" class="metric-value" aria-live="polite">-</strong>
+                <span id="outdoorFeeling" class="metric-feeling">En attente</span>
+              </div>
+
+              <div class="meter" aria-hidden="true">
+                <span id="outdoorMeter" class="meter-fill"></span>
+              </div>
+            </article>
+          </section>
+
+          <section class="advice-block" aria-label="Conseil d'aération">
+            <div id="adviceBanner" class="advice-banner" data-state="neutral" role="status" aria-live="polite">
+              <div class="advice-layout">
+                <div id="decisionIcon" class="advice-icon" aria-hidden="true"></div>
+
+                <div class="advice-copy">
+                  <h3 id="decisionTitle" class="advice-title">Renseignez les 4 champs</h3>
+                  <p id="decisionText" class="advice-text">La recommandation s'ajuste immédiatement à chaque frappe.</p>
+                </div>
+              </div>
+            </div>
+
+            <p id="differenceLine" class="difference-line">Différence : en attente de deux humidex valides.</p>
+          </section>
+        </div>
+      </div>
     </div>
 
     <nav class="mobile-nav" aria-label="Navigation mobile du formulaire">
       <button id="mobilePrev" type="button" class="mobile-nav-button mobile-nav-secondary">Retour</button>
-      <button id="mobileNext" type="button" class="mobile-nav-button mobile-nav-primary">Continuer</button>
     </nav>
   </main>
 
@@ -835,7 +886,6 @@
     const mobileStepTitle = document.getElementById("mobileStepTitle");
     const mobileStepText = document.getElementById("mobileStepText");
     const mobilePrevButton = document.getElementById("mobilePrev");
-    const mobileNextButton = document.getElementById("mobileNext");
     const mobileStepButtons = Array.from(document.querySelectorAll(".mobile-step-dot"));
 
     const icons = {
@@ -870,20 +920,17 @@
       1: {
         kicker: "Étape 1",
         title: "Intérieur",
-        text: "Commencez par la température et l'humidité de la pièce à rafraîchir.",
-        nextLabel: "Vers l'extérieur"
+        text: "Commencez par la température et l'humidité de la pièce à rafraîchir."
       },
       2: {
         kicker: "Étape 2",
         title: "Extérieur",
-        text: "Ajoutez les conditions dehors pour comparer le ressenti.",
-        nextLabel: "Voir le résultat"
+        text: "Ajoutez les conditions dehors pour comparer le ressenti."
       },
       3: {
         kicker: "Étape 3",
         title: "Résultat",
-        text: "Les deux humidex sont calculés, vous pouvez décider d'ouvrir ou non.",
-        nextLabel: "Modifier l'intérieur"
+        text: "Les deux humidex sont calculés, vous pouvez décider d'ouvrir ou non."
       }
     };
 
@@ -976,6 +1023,7 @@
       const stepContent = mobileSteps[currentMobileStep];
 
       mainElement.dataset.mobileStep = String(currentMobileStep);
+      mainElement.style.setProperty("--mobile-step", String(currentMobileStep));
       mobileStepKicker.textContent = stepContent.kicker;
       mobileStepTitle.textContent = stepContent.title;
       mobileStepText.textContent = stepContent.text;
@@ -983,7 +1031,6 @@
       mobilePrevButton.hidden = currentMobileStep === 1;
       mobilePrevButton.disabled = currentMobileStep === 1;
       mobilePrevButton.textContent = currentMobileStep === 3 ? "Modifier l'extérieur" : "Retour";
-      mobileNextButton.textContent = stepContent.nextLabel;
 
       mobileStepButtons.forEach((button) => {
         const buttonStep = Number(button.dataset.step);
@@ -1111,19 +1158,22 @@
       setMobileStep(currentMobileStep - 1);
     });
 
-    mobileNextButton.addEventListener("click", () => {
-      if (currentMobileStep === 3) {
-        setMobileStep(1);
-        return;
-      }
-
-      setMobileStep(currentMobileStep + 1);
-    });
-
     mobileStepButtons.forEach((button) => {
       button.addEventListener("click", () => {
         setMobileStep(Number(button.dataset.step));
       });
+    });
+
+    indoorHumidityInput.addEventListener("input", () => {
+      if (indoorHumidityInput.value.trim() !== "" && currentMobileStep === 1) {
+        setMobileStep(2);
+      }
+    });
+
+    outdoorHumidityInput.addEventListener("input", () => {
+      if (outdoorHumidityInput.value.trim() !== "" && currentMobileStep === 2) {
+        setMobileStep(3);
+      }
     });
 
     updateComparison();
